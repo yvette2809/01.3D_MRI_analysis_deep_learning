@@ -12,11 +12,12 @@ About 10,000 brain structure MRI and their clinical phenotype data is available.
 - OASIS (Open Access Series of Imaging Studies) has ~2000 MRI. Patients and healthy controls. Clinical data (label data) is available.
 
 
-**Model Selection:**
+**Model selection:**
 
 - 3D Convolutional Autoencoder: use this if needed.
 - 3D Convolutional Neural Networks: the primary model with ReLU activation and Xavier initialization of filter parameter for each convolutional layer, and 
 
 
 **To-do list:**
-
+> lksamldi
+>> kjsamdli
