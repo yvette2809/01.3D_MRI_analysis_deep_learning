@@ -38,7 +38,7 @@ About 10,000 brain structure MRI and their clinical phenotype data is available.
   1. More detailed data preprocessing: try to eliminate the skull of each MRI image before performing our model;
   2. Add more demographic features: e.g. age, sex, and other demographic data available;
   3. Model adjustments:
-    - Add more layers or number of neurons on each layer if training error is high;
-    - Add dropouts if the model overfits the training data;
-    - Apply cross-validation if needed.
+      - Add more layers or number of neurons on each layer if training error is high;
+      - Add dropouts if the model overfits the training data;
+      - Apply cross-validation if needed.
   4. Do research on LRP and consider if it should be used in this project.
