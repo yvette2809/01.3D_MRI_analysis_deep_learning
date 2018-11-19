@@ -8,7 +8,7 @@ About 10,000 brain structure MRI and their clinical phenotype data is available.
 
 **Goal:**
 - *Presymptomatic prediction*: Classifying AD from healthy individuals is easy. Even non-deep learning methods can easily give more than  90% of accuracy. Also, this classification has minimal clinical utility (too late). What is clinically useful is to make a prediction of (future) risk for AD when an individual shows minimal to no symptoms of cognitive impairment. This prediction will have clinical impact because it will enable early intervention to delay the course of disease. 
-- 
+- *Interpretable model*: A black box model has little clinical utility to a clinician. A useful model is the one providing information about underlying brain features resulting in the decision (made by a model).
 
 
 **Datasets:** 
@@ -24,7 +24,14 @@ About 10,000 brain structure MRI and their clinical phenotype data is available.
 
 
 **Accomplishments:**
-1. 
+- Computing resource setup:
+  1. Migrated to supercomputer environment, successfully accessed stampede2 via jupyter notebook using Python 3 and installed all required packages;
+  2. Copied nacc data sets to our own work directory in the supercomputer for further use as recommended by Prof. Cha;
+  3. Created a copy of data in scratch library to get faster computation.
+- Model building:
+  1. Applied the 3D convolutional layers to build a 3D Convolutional Autoencoder, still fixing bugs;
+  2. Built a 3D Convolutional Neural Network and applied it on a sample of 3 on our local machine.
+
 
 **To-do list:**
 1. 
