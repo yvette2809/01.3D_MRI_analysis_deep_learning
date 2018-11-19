@@ -2,7 +2,6 @@
 
 
 **Description:** 
-
 About 10,000 brain structure MRI and their clinical phenotype data is available. Some MRI are longitudinal (each participant was followed up several times). MRI data has been preprocessed using standard brain imaging analysis pipeline (denoised, bias corrected, and spatially warped into the standard space).
 
 
@@ -12,13 +11,11 @@ About 10,000 brain structure MRI and their clinical phenotype data is available.
 
 
 **Datasets:** 
-
 - NACC (National Alzheimer Coordinating Center) has ~8000 MRI sessions each of which may have multiple runs of MRI. Some patients have longitudinal follow-ups. Patients and healthy controls. Clinical data (label data) is available. 
 - OASIS (Open Access Series of Imaging Studies) has ~2000 MRI. Patients and healthy controls. Clinical data (label data) is available.
 
 
 **Model selection:**
-
 - 3D Convolutional Autoencoder: use this if needed.
 - 3D Convolutional Neural Networks: the primary model with ReLU activation and Xavier initialization of filter parameter for each convolutional layer, max pooling method for the pooling layer, and softmax for the flattened layer.
 
@@ -34,4 +31,14 @@ About 10,000 brain structure MRI and their clinical phenotype data is available.
 
 
 **To-do list:**
-1. 
+- Scaling up on the supercomputer:
+  1. Install all relevant packages besides tensorflow;
+  2. Set up multiple computing nodes on TACC Stampede2 supercomputer.
+- Improvement on the model itself:
+  1. More detailed data preprocessing: try to eliminate the skull of each MRI image before performing our model;
+  2. Add more demographic features: e.g. age, sex, and other demographic data available;
+  3. Model adjustments:
+    - Add more layers or number of neurons on each layer if training error is high;
+    - Add dropouts if the model overfits the training data;
+    - Apply cross-validation if needed.
+  4. Do research on LRP and consider if it should be used in this project.
