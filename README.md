@@ -27,7 +27,11 @@ About 10,000 brain structure MRI and their clinical phenotype data is available.
   3. Created a copy of data in scratch library to get faster computation.
 - Model building:
   1. Applied the 3D convolutional layers to build a 3D Convolutional Autoencoder, still fixing bugs;
-  2. Built a 3D Convolutional Neural Network and applied it on a sample of 3 on our local machine.
+  2. Built a 3D Convolutional Neural Network and applied it on a sample of 3 on our local machine;
+- Model modification (on a larger scale of data):
+  1. Configured nodes and cores per node needed on supercomputer stampede2;
+  2. Applied the model on a data set of 30 images, which is 6 images for each class, and splited the training and test set randomly;
+  3. Used mini-batch method with a batch size of 5, and ran 5 epochs to track the change of the cost.
 
 
 **To-do list:**
@@ -40,5 +44,7 @@ About 10,000 brain structure MRI and their clinical phenotype data is available.
   3. Model adjustments:
       - Add more layers or number of neurons on each layer if training error is high;
       - Add dropouts if the model overfits the training data;
-      - Apply cross-validation if needed.
+      - Apply cross-validation if needed;
+      - Apply autoencode model to see if it helps accelerating the computing process;
+      - Output results and use the outputs to form necessary visualization later on.
   4. Do research on LRP and consider if it should be used in this project.
