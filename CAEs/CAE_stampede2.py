@@ -127,13 +127,13 @@ def forward_propagation(X, parameters=None):
 
     # ENCODER
 
-    # CONV3D: number of filters in total 16, stride 1, padding 'SAME', activation 'relu', kernel parameter initializer 'xavier'
+    # CONV3D: number of filters in total 4, stride 1, padding 'SAME', activation 'relu', kernel parameter initializer 'xavier'
     # output_size = (batch_size, 256, 256, 256, 4)
     A11 = tf.layers.conv3d(inputs=X, filters=4, kernel_size=3, padding="SAME", strides=1,
                            activation=tf.nn.relu, kernel_initializer=tf.contrib.layers.xavier_initializer(seed=0))
-    # CONV3D: number of filters in total 16, stride 1, padding 'SAME', activation 'relu', kernel parameter initializer 'xavier'
+    # CONV3D: number of filters in total 8, stride 1, padding 'SAME', activation 'relu', kernel parameter initializer 'xavier'
     # output_size = (batch_size, 256, 256, 256, 8)
-    A12 = tf.layers.conv3d(inputs=X, filters=8, kernel_size=3, padding="SAME", strides=1,
+    A12 = tf.layers.conv3d(inputs=A11, filters=8, kernel_size=3, padding="SAME", strides=1,
                            activation=tf.nn.relu, kernel_initializer=tf.contrib.layers.xavier_initializer(seed=0))
     # MAXPOOL: window 3x3, sride 2, padding 'SAME'
     # output_size = (batch_size, 128, 128, 128, 8)
@@ -168,7 +168,7 @@ def forward_propagation(X, parameters=None):
     # UNPOOL: window 3x3, sride 2, padding 'SAME'
     # output_size = (batch_size, 128, 128, 128, 16)
     A5 = tf.keras.backend.resize_volumes(P4, 2, 2, 2, "channels_last")
-    # DECONV3D: number of filters in total 16, stride 1, padding 'SAME', activation 'relu'
+    # DECONV3D: number of filters in total 8, stride 1, padding 'SAME', activation 'relu'
     # output_size = (batch_size, 128, 128, 128, 8)
     P5 = tf.layers.conv3d_transpose(
         inputs=A5, filters=8, kernel_size=3, padding="SAME", strides=1, activation=tf.nn.relu)
@@ -176,7 +176,7 @@ def forward_propagation(X, parameters=None):
     # UNPOOL: window 3x3, sride 2, padding 'SAME'
     # output_size = (batch_size, 256, 256, 256, 8)
     A6 = tf.keras.backend.resize_volumes(P5, 2, 2, 2, "channels_last")
-    # DECONV3D: number of filters in total 1, stride 1, padding 'SAME', activation 'relu'
+    # DECONV3D: number of filters in total 4, stride 1, padding 'SAME', activation 'relu'
     # output_size = (batch_size, 256, 256, 256, 4)
     P61 = tf.layers.conv3d_transpose(
         inputs=A6, filters=4, kernel_size=3, padding="SAME", strides=1, activation=tf.nn.relu)
