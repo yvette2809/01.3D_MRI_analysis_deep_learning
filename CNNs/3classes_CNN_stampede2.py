@@ -15,7 +15,7 @@ from tensorflow.python.framework import ops
 import matplotlib.pyplot as plt
 import math
 
-# get_ipython().run_line_magic('matplotlib', 'inline')
+
 np.random.seed(1)
 
 
@@ -42,14 +42,10 @@ data_info = pd.read_csv('data_info.csv')
 
 data_info['Normal'] = data_info["diagnosis_0normal_1normaltomci_2mci_3ad_4otherdementia"].apply(
     lambda x: 1 if x == 0 else 0)
-#data_info['NormalToMCI'] = data_info["diagnosis_0normal_1normaltomci_2mci_3ad_4otherdementia"].apply(
-#    lambda x: 1 if x == 1 else 0)
 data_info['MCI'] = data_info["diagnosis_0normal_1normaltomci_2mci_3ad_4otherdementia"].apply(
     lambda x: 1 if x == 2 else 0)
 data_info['AD'] = data_info["diagnosis_0normal_1normaltomci_2mci_3ad_4otherdementia"].apply(
     lambda x: 1 if x == 3 else 0)
-#data_info['OtherDementia'] = data_info["diagnosis_0normal_1normaltomci_2mci_3ad_4otherdementia"].apply(
-#    lambda x: 1 if x == 4 else 0)
 
 
 # In[6]:
@@ -66,11 +62,8 @@ data_info.head()
 number_files_loaded = 33
 num = int(number_files_loaded/3)
 sample_list0 = data_info[data_info["diagnosis_0normal_1normaltomci_2mci_3ad_4otherdementia"]==0].iloc[:num, :]["filename"]
-#sample_list1 = data_info[data_info["diagnosis_0normal_1normaltomci_2mci_3ad_4otherdementia"]==1].iloc[:num, :]["filename"]
 sample_list2 = data_info[data_info["diagnosis_0normal_1normaltomci_2mci_3ad_4otherdementia"]==2].iloc[:num, :]["filename"]
 sample_list3 = data_info[data_info["diagnosis_0normal_1normaltomci_2mci_3ad_4otherdementia"]==3].iloc[:num, :]["filename"]
-#sample_list4 = data_info[data_info["diagnosis_0normal_1normaltomci_2mci_3ad_4otherdementia"]==4].iloc[:num, :]["filename"]
-#sample_list = pd.concat([sample_list0,sample_list1,sample_list2,sample_list3,sample_list4])
 sample_list = pd.concat([sample_list0,sample_list2,sample_list3])
 
 tar = tarfile.open("nacc_copy_TeamA.tar")
@@ -93,14 +86,10 @@ s = sample_dataset.reshape(number_files_loaded, 256, 256, 256, 1)
 
 
 y0 = data_info[data_info["diagnosis_0normal_1normaltomci_2mci_3ad_4otherdementia"]==0].iloc[:num, 4:7]
-#y1 = data_info[data_info["diagnosis_0normal_1normaltomci_2mci_3ad_4otherdementia"]==1].iloc[:num, 4:9]
 y2 = data_info[data_info["diagnosis_0normal_1normaltomci_2mci_3ad_4otherdementia"]==2].iloc[:num, 4:7]
 y3 = data_info[data_info["diagnosis_0normal_1normaltomci_2mci_3ad_4otherdementia"]==3].iloc[:num, 4:7]
-#y4 = data_info[data_info["diagnosis_0normal_1normaltomci_2mci_3ad_4otherdementia"]==4].iloc[:num, 4:9]
-#y = pd.concat([y0,y1,y2,y3,y4])
 y = pd.concat([y0,y2,y3])
 y = np.array(y)
-# y[:5]
 
 
 # ### 2. Split the dataset to training and test sets
@@ -197,30 +186,30 @@ def forward_propagation(X, parameters=None):
     """
 
     # CONV3D: number of filters in total 8, stride 1, padding 'SAME', activation 'relu', kernel parameter initializer 'xavier'
-    # output_size = (3, 256, 256, 256, 8)
+    # output_size = (batch_size, 256, 256, 256, 8)
     A1 = tf.layers.conv3d(X, filters=8, kernel_size=4, strides=1, padding="SAME",
                           activation=tf.nn.relu, kernel_initializer=tf.contrib.layers.xavier_initializer(seed=0))
 
     # MAXPOOL: window 8x8, sride 8, padding 'SAME'
-    # output_size = (3, 32, 32, 32, 8)
+    # output_size = (batch_size, 32, 32, 32, 8)
     P1 = tf.layers.max_pooling3d(A1, pool_size=8, strides=8, padding="SAME")
 
     # CONV3D: number of filters in total 16, stride 1, padding 'SAME', activation 'relu', kernel parameter initializer 'xavier'
-    # output_size = (3, 32, 32, 32, 16)
+    # output_size = (batch_size, 32, 32, 32, 16)
     A2 = tf.layers.conv3d(P1, filters=16, kernel_size=2, strides=1, padding="SAME",
                           activation=tf.nn.relu, kernel_initializer=tf.contrib.layers.xavier_initializer(seed=0))
 
     # MAXPOOL: window 4x4, stride 4, padding 'SAME'
-    # output_size = (3, 8, 8, 8, 16)
+    # output_size = (batch_size, 8, 8, 8, 16)
     P2 = tf.layers.max_pooling3d(A2, pool_size=4, strides=4, padding="SAME")
 
     # FLATTEN
-    # output_size = (3, 8192)
+    # output_size = (batch_size, 8192)
     P2 = tf.contrib.layers.flatten(P2)
 
     # FULLY-CONNECTED without non-linear activation function (do not call softmax).
     # 5 neurons in output layer. Hint: one of the arguments should be "activation_fn=None"
-    # output_size = (3,5)
+    # output_size = (batch_size, 3)
     Z3 = tf.contrib.layers.fully_connected(P2, 3, activation_fn=None)
 
     return Z3
@@ -309,9 +298,9 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.009,
 
     Arguments:
     X_train -- training set, of shape (None, 256 256, 256, 1)
-    Y_train -- test set, of shape (None, n_y = 5)
+    Y_train -- test set, of shape (None, n_y = 3)
     X_test -- training set, of shape (None, 256, 256, 256, 1)
-    Y_test -- test set, of shape (None, n_y = 5)
+    Y_test -- test set, of shape (None, n_y = 3)
     learning_rate -- learning rate of the optimization
     num_epochs -- number of epochs of the optimization loop
     minibatch_size -- size of a minibatch
@@ -382,7 +371,7 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.009,
             if print_cost == True and epoch % 1 == 0:
                 costs.append(minibatch_cost)
 
-        # plot the cost
+        # plot the cost and output the cost graph as png in supercomputer
         plt.plot(np.squeeze(costs))
         plt.ylabel('cost')
         plt.xlabel('iterations')
