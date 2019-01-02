@@ -128,60 +128,60 @@ def forward_propagation(X, parameters=None):
     # ENCODER
 
     # CONV3D: number of filters in total 16, stride 1, padding 'SAME', activation 'relu', kernel parameter initializer 'xavier'
-    # output_size = (3, 256, 256, 256, 4)
+    # output_size = (batch_size, 256, 256, 256, 4)
     A11 = tf.layers.conv3d(inputs=X, filters=4, kernel_size=3, padding="SAME", strides=1,
                            activation=tf.nn.relu, kernel_initializer=tf.contrib.layers.xavier_initializer(seed=0))
     # CONV3D: number of filters in total 16, stride 1, padding 'SAME', activation 'relu', kernel parameter initializer 'xavier'
-    # output_size = (3, 256, 256, 256, 8)
+    # output_size = (batch_size, 256, 256, 256, 8)
     A12 = tf.layers.conv3d(inputs=X, filters=8, kernel_size=3, padding="SAME", strides=1,
                            activation=tf.nn.relu, kernel_initializer=tf.contrib.layers.xavier_initializer(seed=0))
     # MAXPOOL: window 3x3, sride 2, padding 'SAME'
-    # output_size = (3, 128, 128, 128, 8)
+    # output_size = (batch_size, 128, 128, 128, 8)
     P1 = tf.layers.max_pooling3d(A12, pool_size=3, strides=2, padding="SAME")
 
     # CONV3D: number of filters in total 32, stride 1, padding 'SAME', activation 'relu', kernel parameter initializer 'xavier'
-    # output_size = (3, 128, 128, 128, 16)
+    # output_size = (batch_size, 128, 128, 128, 16)
     A2 = tf.layers.conv3d(inputs=P1, filters=16, kernel_size=3, padding="SAME", strides=1,
                           activation=tf.nn.relu, kernel_initializer=tf.contrib.layers.xavier_initializer(seed=0))
     # MAXPOOL: window 3x3, sride 2, padding 'SAME'
-    # output_size = (3, 64, 64, 64, 16)
+    # output_size = (batch_size, 64, 64, 64, 16)
     P2 = tf.layers.max_pooling3d(A2, pool_size=3, strides=2, padding="SAME")
 
     # CONV3D: number of filters in total 32, stride 1, padding 'SAME', activation 'relu', kernel parameter initializer 'xavier'
-    # output_size = (3, 64, 64, 64, 32)
+    # output_size = (batch_size, 64, 64, 64, 32)
     A3 = tf.layers.conv3d(inputs=P2, filters=32, kernel_size=3, padding="SAME", strides=1,
                           activation=tf.nn.relu, kernel_initializer=tf.contrib.layers.xavier_initializer(seed=0))
     # MAXPOOL: window 3x3, sride 2, padding 'SAME'
-    # output_size = (3, 32, 32, 32, 32)
+    # output_size = (batch_size, 32, 32, 32, 32)
     P3 = tf.layers.max_pooling3d(A3, pool_size=3, strides=2, padding="SAME")
 
     # DECODER
 
     # UNPOOL: window 3x3, sride 2, padding 'SAME'
-    # output_size = (3, 64, 64, 64, 32)
+    # output_size = (batch_size, 64, 64, 64, 32)
     A4 = tf.keras.backend.resize_volumes(P3, 2, 2, 2, "channels_last")
     # DECONV3D: number of filters in total 16, stride 1, padding 'SAME', activation 'relu'
-    # output_size = (3, 64, 64, 64, 16)
+    # output_size = (batch_size, 64, 64, 64, 16)
     P4 = tf.layers.conv3d_transpose(
         inputs=A4, filters=16, kernel_size=3, padding="SAME", strides=1, activation=tf.nn.relu)
 
     # UNPOOL: window 3x3, sride 2, padding 'SAME'
-    # output_size = (3, 128, 128, 128, 16)
+    # output_size = (batch_size, 128, 128, 128, 16)
     A5 = tf.keras.backend.resize_volumes(P4, 2, 2, 2, "channels_last")
     # DECONV3D: number of filters in total 16, stride 1, padding 'SAME', activation 'relu'
-    # output_size = (3, 128, 128, 128, 8)
+    # output_size = (batch_size, 128, 128, 128, 8)
     P5 = tf.layers.conv3d_transpose(
         inputs=A5, filters=8, kernel_size=3, padding="SAME", strides=1, activation=tf.nn.relu)
 
     # UNPOOL: window 3x3, sride 2, padding 'SAME'
-    # output_size = (3, 256, 256, 256, 8)
+    # output_size = (batch_size, 256, 256, 256, 8)
     A6 = tf.keras.backend.resize_volumes(P5, 2, 2, 2, "channels_last")
     # DECONV3D: number of filters in total 1, stride 1, padding 'SAME', activation 'relu'
-    # output_size = (3, 256, 256, 256, 4)
+    # output_size = (batch_size, 256, 256, 256, 4)
     P61 = tf.layers.conv3d_transpose(
         inputs=A6, filters=4, kernel_size=3, padding="SAME", strides=1, activation=tf.nn.relu)
     # DECONV3D: number of filters in total 1, stride 1, padding 'SAME', activation 'relu'
-    # output_size = (3, 256, 256, 256, 1)
+    # output_size = (batch_size, 256, 256, 256, 1)
     P62 = tf.layers.conv3d_transpose(
         inputs=P61, filters=1, kernel_size=3, padding="SAME", strides=1, activation=tf.nn.relu)
 
@@ -262,13 +262,14 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.009,
           num_epochs=3, minibatch_size=1, print_cost=True):
     """
     Implements a three-layer ConvNet in Tensorflow:
-    CONV2D -> RELU -> MAXPOOL -> CONV2D -> RELU -> MAXPOOL -> FLATTEN -> FULLYCONNECTED
-
+    CONV3D -> CONV3D -> MAXPOOL -> CONV3D -> MAXPOOL -> CONV3D -> MAXPOOL -> (encoder part)
+    UNPOOL -> DECONV3D -> UNPOOL -> DECONV3D -> UNPOOL -> DECONV3D -> DECONV3D (decoder part)
+    
     Arguments:
     X_train -- training set, of shape (None, 256 256, 256, 1)
-    Y_train -- test set, of shape (None, n_y = 5)
+    Y_train -- test set, of shape (None, 256 256, 256, 1)
     X_test -- training set, of shape (None, 256, 256, 256, 1)
-    Y_test -- test set, of shape (None, n_y = 5)
+    Y_test -- test set, of shape (None, 256 256, 256, 1)
     learning_rate -- learning rate of the optimization
     num_epochs -- number of epochs of the optimization loop
     minibatch_size -- size of a minibatch
