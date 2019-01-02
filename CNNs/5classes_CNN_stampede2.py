@@ -7,7 +7,6 @@
 import tarfile
 import pandas as pd
 import numpy as np
-# from nilearn import plotting
 import os
 import nibabel as nib
 import tensorflow as tf
@@ -15,7 +14,7 @@ from tensorflow.python.framework import ops
 import matplotlib.pyplot as plt
 import math
 
-# get_ipython().run_line_magic('matplotlib', 'inline')
+
 np.random.seed(1)
 
 
@@ -195,30 +194,30 @@ def forward_propagation(X, parameters=None):
     """
 
     # CONV3D: number of filters in total 8, stride 1, padding 'SAME', activation 'relu', kernel parameter initializer 'xavier'
-    # output_size = (3, 256, 256, 256, 8)
+    # output_size = (batch_size, 256, 256, 256, 8)
     A1 = tf.layers.conv3d(X, filters=8, kernel_size=4, strides=1, padding="SAME",
                           activation=tf.nn.relu, kernel_initializer=tf.contrib.layers.xavier_initializer(seed=0))
 
-    # MAXPOOL: window 8x8, sride 8, padding 'SAME'
-    # output_size = (3, 32, 32, 32, 8)
+    # MAXPOOL: window 8x8x8, sride 8, padding 'SAME'
+    # output_size = (batch_size, 32, 32, 32, 8)
     P1 = tf.layers.max_pooling3d(A1, pool_size=8, strides=8, padding="SAME")
 
     # CONV3D: number of filters in total 16, stride 1, padding 'SAME', activation 'relu', kernel parameter initializer 'xavier'
-    # output_size = (3, 32, 32, 32, 16)
+    # output_size = (batch_size, 32, 32, 32, 16)
     A2 = tf.layers.conv3d(P1, filters=16, kernel_size=2, strides=1, padding="SAME",
                           activation=tf.nn.relu, kernel_initializer=tf.contrib.layers.xavier_initializer(seed=0))
 
-    # MAXPOOL: window 4x4, stride 4, padding 'SAME'
-    # output_size = (3, 8, 8, 8, 16)
+    # MAXPOOL: window 4x4x4, stride 4, padding 'SAME'
+    # output_size = (batch_size, 8, 8, 8, 16)
     P2 = tf.layers.max_pooling3d(A2, pool_size=4, strides=4, padding="SAME")
 
     # FLATTEN
-    # output_size = (3, 8192)
+    # output_size = (batch_size, 8192)
     P2 = tf.contrib.layers.flatten(P2)
 
     # FULLY-CONNECTED without non-linear activation function (do not call softmax).
     # 5 neurons in output layer. Hint: one of the arguments should be "activation_fn=None"
-    # output_size = (3,5)
+    # output_size = (batch_size,5)
     Z3 = tf.contrib.layers.fully_connected(P2, 5, activation_fn=None)
 
     return Z3
@@ -306,7 +305,7 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.009,
     CONV2D -> RELU -> MAXPOOL -> CONV2D -> RELU -> MAXPOOL -> FLATTEN -> FULLYCONNECTED
 
     Arguments:
-    X_train -- training set, of shape (None, 256 256, 256, 1)
+    X_train -- training set, of shape (None, 256, 256, 256, 1)
     Y_train -- test set, of shape (None, n_y = 5)
     X_test -- training set, of shape (None, 256, 256, 256, 1)
     Y_test -- test set, of shape (None, n_y = 5)
