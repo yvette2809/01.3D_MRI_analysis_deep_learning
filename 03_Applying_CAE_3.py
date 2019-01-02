@@ -7,15 +7,14 @@
 import tarfile
 import pandas as pd
 import numpy as np
-# from nilearn import plotting
 import os
 import nibabel as nib
 import tensorflow as tf
 from tensorflow.python.framework import ops
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import math
 
-# get_ipython().run_line_magic('matplotlib', 'inline')
+
 np.random.seed(1)
 
 
@@ -25,31 +24,10 @@ os.chdir('/work/05982/tg852820/TeamA')
 data_info = pd.read_csv('data_info.csv')
 
 
-# In[3]:
-
-
-data_info['Normal'] = data_info["diagnosis_0normal_1normaltomci_2mci_3ad_4otherdementia"].apply(
-    lambda x: 1 if x == 0 else 0)
-data_info['NormalToMCI'] = data_info["diagnosis_0normal_1normaltomci_2mci_3ad_4otherdementia"].apply(
-    lambda x: 1 if x == 1 else 0)
-data_info['MCI'] = data_info["diagnosis_0normal_1normaltomci_2mci_3ad_4otherdementia"].apply(
-    lambda x: 1 if x == 2 else 0)
-data_info['AD'] = data_info["diagnosis_0normal_1normaltomci_2mci_3ad_4otherdementia"].apply(
-    lambda x: 1 if x == 3 else 0)
-data_info['OtherDementia'] = data_info["diagnosis_0normal_1normaltomci_2mci_3ad_4otherdementia"].apply(
-    lambda x: 1 if x == 4 else 0)
-
-
-# In[4]:
-
-
-# data_info.head()
-
-
 # In[5]:
 
 
-number_files_loaded = 40
+number_files_loaded = 30
 sample_list = data_info.iloc[:number_files_loaded, :]["filename"]
 
 tar = tarfile.open("nacc_copy_TeamA.tar")
@@ -59,7 +37,6 @@ for file in sample_list:
     
 sample_data_list = list()
 for filename in sample_list:
-    # or is it better to use get_fdata()?
     a = nib.load("fs_t1/"+filename).get_data()
     sample_data_list.append(a)
 sample_dataset = np.array(sample_data_list, dtype=np.float32)
@@ -151,23 +128,23 @@ def forward_propagation(X, parameters=None):
     # ENCODER
 
     # CONV3D: number of filters in total 16, stride 1, padding 'SAME', activation 'relu', kernel parameter initializer 'xavier'
-    # output_size = (3, 256, 256, 256, 16)
+    # output_size = (3, 256, 256, 256, 4)
     A11 = tf.layers.conv3d(inputs=X, filters=4, kernel_size=3, padding="SAME", strides=1,
                            activation=tf.nn.relu, kernel_initializer=tf.contrib.layers.xavier_initializer(seed=0))
     # CONV3D: number of filters in total 16, stride 1, padding 'SAME', activation 'relu', kernel parameter initializer 'xavier'
-    # output_size = (3, 256, 256, 256, 16)
+    # output_size = (3, 256, 256, 256, 8)
     A12 = tf.layers.conv3d(inputs=X, filters=8, kernel_size=3, padding="SAME", strides=1,
                            activation=tf.nn.relu, kernel_initializer=tf.contrib.layers.xavier_initializer(seed=0))
     # MAXPOOL: window 3x3, sride 2, padding 'SAME'
-    # output_size = (3, 128, 128, 128, 16)
+    # output_size = (3, 128, 128, 128, 8)
     P1 = tf.layers.max_pooling3d(A12, pool_size=3, strides=2, padding="SAME")
 
     # CONV3D: number of filters in total 32, stride 1, padding 'SAME', activation 'relu', kernel parameter initializer 'xavier'
-    # output_size = (3, 128, 128, 128, 32)
+    # output_size = (3, 128, 128, 128, 16)
     A2 = tf.layers.conv3d(inputs=P1, filters=16, kernel_size=3, padding="SAME", strides=1,
                           activation=tf.nn.relu, kernel_initializer=tf.contrib.layers.xavier_initializer(seed=0))
     # MAXPOOL: window 3x3, sride 2, padding 'SAME'
-    # output_size = (3, 64, 64, 64, 32)
+    # output_size = (3, 64, 64, 64, 16)
     P2 = tf.layers.max_pooling3d(A2, pool_size=3, strides=2, padding="SAME")
 
     # CONV3D: number of filters in total 32, stride 1, padding 'SAME', activation 'relu', kernel parameter initializer 'xavier'
@@ -184,23 +161,23 @@ def forward_propagation(X, parameters=None):
     # output_size = (3, 64, 64, 64, 32)
     A4 = tf.keras.backend.resize_volumes(P3, 2, 2, 2, "channels_last")
     # DECONV3D: number of filters in total 16, stride 1, padding 'SAME', activation 'relu'
-    # output_size = (3, 64, 64, 64, 32)
+    # output_size = (3, 64, 64, 64, 16)
     P4 = tf.layers.conv3d_transpose(
         inputs=A4, filters=16, kernel_size=3, padding="SAME", strides=1, activation=tf.nn.relu)
 
     # UNPOOL: window 3x3, sride 2, padding 'SAME'
-    # output_size = (3, 128, 128, 128, 32)
+    # output_size = (3, 128, 128, 128, 16)
     A5 = tf.keras.backend.resize_volumes(P4, 2, 2, 2, "channels_last")
     # DECONV3D: number of filters in total 16, stride 1, padding 'SAME', activation 'relu'
-    # output_size = (3, 128, 128, 128, 16)
+    # output_size = (3, 128, 128, 128, 8)
     P5 = tf.layers.conv3d_transpose(
         inputs=A5, filters=8, kernel_size=3, padding="SAME", strides=1, activation=tf.nn.relu)
 
     # UNPOOL: window 3x3, sride 2, padding 'SAME'
-    # output_size = (3, 256, 256, 256, 16)
+    # output_size = (3, 256, 256, 256, 8)
     A6 = tf.keras.backend.resize_volumes(P5, 2, 2, 2, "channels_last")
     # DECONV3D: number of filters in total 1, stride 1, padding 'SAME', activation 'relu'
-    # output_size = (3, 256, 256, 256, 1)
+    # output_size = (3, 256, 256, 256, 4)
     P61 = tf.layers.conv3d_transpose(
         inputs=A6, filters=4, kernel_size=3, padding="SAME", strides=1, activation=tf.nn.relu)
     # DECONV3D: number of filters in total 1, stride 1, padding 'SAME', activation 'relu'
@@ -233,19 +210,6 @@ def compute_cost(P62, Y):
     return cost
 
 
-# with tf.Session() as sess:
-#     X = create_placeholders(256, 256, 256, 1)
-#     Y = create_placeholders(256, 256, 256, 1)
-#     P62 = forward_propagation(X)
-#     init_op = tf.global_variables_initializer()
-#     cost = compute_cost(P62, Y)
-#     sess.run(init_op)
-#     cost_ = sess.run(cost, feed_dict={X: X_train, Y: Y_train})
-# #     decode_output = sess.run(P62, feed_dict={X: s})
-# #     encode_output = sess.run(P3, feed_dict={X: s})
-# print(cost_)
-
-
 # In[ ]:
 
 
@@ -255,7 +219,7 @@ def random_mini_batches(X, Y, mini_batch_size=1, seed=0):
 
     Arguments:
     X -- input data, of shape (input size, n_D0, n_H0, n_W0, n_C0)
-    Y -- true "label" vector (1 for blue dot / 0 for red dot), of shape (1, number of examples)
+    Y -- true "label" data, of shape (input size, n_D0, n_H0, n_W0, n_C0)
     mini_batch_size -- size of the mini-batches, integer
 
     Returns:
@@ -289,23 +253,6 @@ def random_mini_batches(X, Y, mini_batch_size=1, seed=0):
         mini_batches.append(mini_batch)
 
     return mini_batches
-
-
-
-# minibatch = random_mini_batches(X_train, Y_train)[0]
-# mini_X, mini_Y = minibatch
-
-# with tf.Session() as sess:
-#     X = create_placeholders(256, 256, 256, 1)
-#     Y = create_placeholders(256, 256, 256, 1)
-#     P62 = forward_propagation(X)
-#     init_op = tf.global_variables_initializer()
-#     minibatch = random_mini_batches(X, Y)
-#     sess.run(init_op)
-#     batch = sess.run(minibatch, feed_dict={X: X_train, Y: Y_train})
-#     decode_output = sess.run(P62, feed_dict={X: s})
-#     encode_output = sess.run(P3, feed_dict={X: s})
-# print(mini_X.shape)
 
 
 # In[ ]:
@@ -393,11 +340,11 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.009,
                 costs.append(minibatch_cost)
 
         # plot the cost
-#         plt.plot(np.squeeze(costs))
-#         plt.ylabel('cost')
-#         plt.xlabel('iterations (per tens)')
-#         plt.title("Learning rate =" + str(learning_rate))
-#         plt.show()
+        plt.plot(np.squeeze(costs))
+        plt.ylabel('cost')
+        plt.xlabel('iterations')
+        plt.title("Learning rate=" + str(learning_rate)+"  Sample size="+str(number_files_loaded)+"  batch size="+str(minibatch_size))
+        plt.savefig("CAE_cost.png")
 
         # Calculate the correct predictions
         predict_op = tf.argmax(P62, 1)
@@ -417,5 +364,5 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate=0.009,
 # In[ ]:
 
 
-_, _ = model(X_train, Y_train, X_test, Y_test, learning_rate=0.006, num_epochs=5, minibatch_size=6)
+_, _ = model(X_train, Y_train, X_test, Y_test, learning_rate=0.006, num_epochs=5, minibatch_size=5)
 
