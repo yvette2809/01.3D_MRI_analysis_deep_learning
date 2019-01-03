@@ -16,7 +16,7 @@ About 10,000 brain structure MRI and their clinical phenotype data is available.
 
 
 **Model selection:**
-- 3D Convolutional Autoencoder: use this if needed.
+- 3D Convolutional Autoencoder;
 - 3D Convolutional Neural Networks: the primary model with ReLU activation and Xavier initialization of filter parameter for each convolutional layer, max pooling method for the pooling layer, and softmax for the flattened layer.
 
 
@@ -34,17 +34,7 @@ About 10,000 brain structure MRI and their clinical phenotype data is available.
   3. Used mini-batch method with a batch size of 5, and ran 5 epochs to track the change of the cost.
 
 
-**To-do list:**
-- Scaling up on the supercomputer:
-  1. Install all relevant packages besides tensorflow;
-  2. Set up multiple computing nodes on TACC Stampede2 supercomputer.
-- Improvement on the model itself:
-  1. More detailed data preprocessing: try to eliminate the skull of each MRI image before performing our model;
-  2. Add more demographic features: e.g. age, sex, and other demographic data available;
-  3. Model adjustments:
-      - Add more layers or number of neurons on each layer if training error is high;
-      - Add dropouts if the model overfits the training data;
-      - Apply cross-validation if needed;
-      - Apply autoencode model to see if it helps accelerating the computing process;
-      - Output results and use the outputs to form necessary visualization later on.
-  4. Do research on LRP and consider if it should be used in this project.
+**Contents of the repo**
+- CAEs:
+- CNNs:
+
