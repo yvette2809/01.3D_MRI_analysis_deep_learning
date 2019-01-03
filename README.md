@@ -36,8 +36,16 @@ About 10,000 brain structure MRI and their clinical phenotype data is available.
 
 **Contents of the repo**
 - CAEs:
-  1. 
+  1. CAE_googlecloud.py
+  2. CAE_stampede2.py
 - CNNs:
-- descriptive data analysis:
-- scratch:
-- 
+  1. 3classes_CNN_googlecloud.py
+  2. 3classes_CNN_stampede2.py
+  3. 5classes_CNN_stampede2.py
+  4. deepCNN.py
+- descriptive data analysis: 
+- scratch: 
+- supercomputer setup and file transfer:
+  1. File Transfer within stampede2.ipynb
+  2. Initial Trials and Errors - 1.ipynb
+  3. Multi Node Test via Jupyter- Fail, No Permission.ipynb
