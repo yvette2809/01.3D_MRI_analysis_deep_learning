@@ -10,16 +10,19 @@ About 10,000 brain structure MRI and their clinical phenotype data is available.
 - *Presymptomatic prediction*: Classifying AD from healthy individuals is easy. Even non-deep learning methods can easily give more than  90% of accuracy. Also, this classification has minimal clinical utility (too late). What is clinically useful is to make a prediction of (future) risk for AD when an individual shows minimal to no symptoms of cognitive impairment. This prediction will have clinical impact because it will enable early intervention to delay the course of disease. 
 - *Interpretable model*: A black box model has little clinical utility to a clinician. A useful model is the one providing information about underlying brain features resulting in the decision (made by a model).
 
+** **
 
 **Datasets:** 
 - NACC (National Alzheimer Coordinating Center) has ~8000 MRI sessions each of which may have multiple runs of MRI. Some patients have longitudinal follow-ups. Patients and healthy controls. Clinical data (label data) is available. 
 - OASIS (Open Access Series of Imaging Studies) has ~2000 MRI. Patients and healthy controls. Clinical data (label data) is available.
 
+** **
 
 **Model selection:**
 - 3D Convolutional Autoencoder;
 - 3D Convolutional Neural Networks: the primary model with ReLU activation and Xavier initialization of filter parameter for each convolutional layer, max pooling method for the pooling layer, and softmax for the flattened layer.
 
+** **
 
 **Accomplishments:**
 - Computing resource setup:
@@ -34,6 +37,7 @@ About 10,000 brain structure MRI and their clinical phenotype data is available.
   2. Applied the model on a data set of 30 images, which is 6 images for each class, and splited the training and test set randomly;
   3. Used mini-batch method with a batch size of 5, and ran 5 epochs to track the change of the cost.
 
+** **
 
 **Contents of the repo**
 - CAEs:
