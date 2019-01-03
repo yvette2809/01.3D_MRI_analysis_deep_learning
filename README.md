@@ -36,5 +36,8 @@ About 10,000 brain structure MRI and their clinical phenotype data is available.
 
 **Contents of the repo**
 - CAEs:
+  1. 
 - CNNs:
-
+- descriptive data analysis:
+- scratch:
+- 
